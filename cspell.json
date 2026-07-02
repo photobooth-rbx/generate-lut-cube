@@ -3,7 +3,12 @@
     "ignorePaths": [],
     "dictionaryDefinitions": [],
     "dictionaries": [],
-    "words": [],
+    "words": [
+        "pkgs",
+        "rects",
+        "rshift",
+        "writeu"
+    ],
     "ignoreWords": [],
     "import": []
 }

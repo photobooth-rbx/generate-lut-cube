@@ -8,12 +8,10 @@
 				"$path": "Packages"
 			}
 		},
-		"StarterPlayer": {
-			"$className": "StarterPlayer",
-			"StarterPlayerScripts": {
-				"Entry": {
-					"$path": "src"
-				}
+		"ServerScriptService": {
+			"$className": "ServerScriptService",
+			"Entry": {
+				"$path": "src"
 			}
 		}
 	}
