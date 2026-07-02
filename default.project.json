@@ -1,0 +1,20 @@
+{
+	"name": "generate-lut-grading",
+	"tree": {
+		"$className": "DataModel",
+		"ReplicatedStorage": {
+			"$className": "ReplicatedStorage",
+			"Packages": {
+				"$path": "Packages"
+			}
+		},
+		"StarterPlayer": {
+			"$className": "StarterPlayer",
+			"StarterPlayerScripts": {
+				"Entry": {
+					"$path": "src"
+				}
+			}
+		}
+	}
+}

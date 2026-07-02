@@ -1,0 +1,9 @@
+[package]
+name = "egomoose/generate-lut-grading"
+version = "0.1.0"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+private = true
+
+[dependencies]
+Parallel = "egomoose/parallel@0.2.0"
