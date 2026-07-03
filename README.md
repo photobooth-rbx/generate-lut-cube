@@ -1,4 +1,4 @@
-# generate-lut-grading
+# generate-lut-cube
 
 This project is used to generate LUTs with roblox's grading system.
 
