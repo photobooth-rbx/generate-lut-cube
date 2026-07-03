@@ -9,9 +9,9 @@ local function worker(rect: Rect)
 	for y = rect.Min.Y + 1, rect.Max.Y do
 		for x = rect.Min.X + 1, rect.Max.X do
 			local i = (y - 1) * 4096 + (x - 1)
-			local r = bit32.band(bit32.rshift(i, 16), 0xFF)
+			local r = bit32.band(bit32.rshift(i, 0), 0xFF)
 			local g = bit32.band(bit32.rshift(i, 8), 0xFF)
-			local b = bit32.band(bit32.rshift(i, 0), 0xFF)
+			local b = bit32.band(bit32.rshift(i, 16), 0xFF)
 
 			bi = bi + 1
 			local bj = (bi - 1) * 4
