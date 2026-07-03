@@ -51,11 +51,13 @@ local function generateTiledLUT()
 	frame.BackgroundTransparency = 1
 	frame.Size = UDim2.fromOffset(4096, 4096)
 
+	local images = {}
 	for i, rect in chunkRects do
 		local b = results[i]()
 		local rectSize = Vector2.new(rect.Width, rect.Height)
 		local editImage = AssetService:CreateEditableImage({ Size = rectSize })
 		editImage:WritePixelsBuffer(Vector2.zero, rectSize, b)
+		images[i] = editImage
 
 		local label = Instance.new("ImageLabel")
 		label.Name = tostring(i)
@@ -67,7 +69,13 @@ local function generateTiledLUT()
 		label.Parent = frame
 	end
 
-	return frame
+	local function destroyImages()
+		for _, editImage in images do
+			editImage:Destroy()
+		end
+	end
+
+	return frame, destroyImages
 end
 
 return generateTiledLUT

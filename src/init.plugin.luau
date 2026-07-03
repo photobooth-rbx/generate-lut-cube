@@ -90,7 +90,7 @@ local function captureLUT()
 	surface.LightInfluence = 0
 	surface.Parent = part
 
-	local frame = GenerateTiledLUT()
+	local frame, destroyImages = GenerateTiledLUT()
 	frame.Parent = surface
 
 	workspace:SetAttribute("Ready", false)
@@ -98,6 +98,8 @@ local function captureLUT()
 	workspace:SetAttribute("Ready", nil)
 
 	local editImage = screenshot()
+	destroyImages()
+
 	if editImage then
 		local meshPart = Instance.new("MeshPart")
 		meshPart.TextureContent = Content.fromObject(editImage)
