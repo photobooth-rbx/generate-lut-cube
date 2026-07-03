@@ -92,5 +92,7 @@ surface.Face = Enum.NormalId.Back
 surface.LightInfluence = 0
 surface.Parent = part
 
+local t = os.clock()
 local frame = generateTiledLUT()
 frame.Parent = surface
+print(os.clock() - t)
