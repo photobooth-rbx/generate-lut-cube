@@ -1,5 +1,6 @@
 local AssetService = game:GetService("AssetService")
 local CaptureService = game:GetService("CaptureService")
+local ScriptEditorService = game:GetService("ScriptEditorService")
 
 local GenerateTiledLUT = require(script.GenerateTiledLUT)
 
@@ -18,6 +19,53 @@ local function screenshot()
 	end
 
 	return result and AssetService:CreateEditableImageAsync(Content.fromUri(result))
+end
+
+@native
+local function writeCube(editImage: EditableImage, lutSize: number?)
+	local pixels = editImage:ReadPixelsBuffer(Vector2.zero, editImage.Size)
+
+	local sampleLUTSize = lutSize or 33
+	local entries = sampleLUTSize ^ 3
+
+	local norm = table.create(256)
+	for v = 0, 255 do
+		norm[v] = string.format("%.6f", v / 255)
+	end
+
+	local srcIndex = table.create(sampleLUTSize)
+	for j = 0, sampleLUTSize - 1 do
+		srcIndex[j] = math.round(j / (sampleLUTSize - 1) * 255)
+	end
+
+	local lines = table.create(entries + 2)
+	lines[1] = 'TITLE "LUT"'
+	lines[2] = "LUT_3D_SIZE " .. sampleLUTSize
+
+	local n = 2
+	for bj = 0, sampleLUTSize - 1 do
+		local bSrc = srcIndex[bj] * 65536
+		for gj = 0, sampleLUTSize - 1 do
+			local gSrc = srcIndex[gj] * 256
+			for rj = 0, sampleLUTSize - 1 do
+				local pixel = (bSrc + gSrc + srcIndex[rj]) * 4
+				local r = buffer.readu8(pixels, pixel + 0)
+				local g = buffer.readu8(pixels, pixel + 1)
+				local b = buffer.readu8(pixels, pixel + 2)
+
+				n += 1
+				lines[n] = norm[r] .. " " .. norm[g] .. " " .. norm[b]
+			end
+		end
+	end
+
+	local module = Instance.new("ModuleScript")
+	module.Name = "LUT.cube"
+	ScriptEditorService:UpdateSourceAsync(module, function()
+		return table.concat(lines, "\n")
+	end)
+
+	return module
 end
 
 local function captureLUT()
@@ -51,8 +99,13 @@ local function captureLUT()
 
 	local editImage = screenshot()
 	if editImage then
-		print(editImage.Size)
-		editImage:Destroy()
+		local meshPart = Instance.new("MeshPart")
+		meshPart.TextureContent = Content.fromObject(editImage)
+		meshPart.Name = "LUT"
+		meshPart.Parent = game:GetService("StarterGui")
+
+		local cubeModule = writeCube(editImage, 65) -- 33, 65, 256
+		cubeModule.Parent = meshPart
 	end
 
 	part:Destroy()
