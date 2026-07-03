@@ -1,7 +1,5 @@
 local AssetService = game:GetService("AssetService")
-
-local pkgs = game.ReplicatedStorage.Packages
-local Parallel = require(pkgs.Parallel)
+local Parallel = require(script.Parent.Packages.Parallel)
 
 type WorkerAction = typeof(require(script.Worker))
 

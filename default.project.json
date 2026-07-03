@@ -4,14 +4,11 @@
 		"$className": "DataModel",
 		"ReplicatedStorage": {
 			"$className": "ReplicatedStorage",
-			"Packages": {
-				"$path": "Packages"
-			}
-		},
-		"ServerScriptService": {
-			"$className": "ServerScriptService",
-			"Entry": {
-				"$path": "src"
+			"GenLUT": {
+				"$path": "src",
+				"Packages": {
+					"$path": "Packages"
+				}
 			}
 		}
 	}
