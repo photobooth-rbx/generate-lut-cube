@@ -1,25 +1,8 @@
 local AssetService = game:GetService("AssetService")
-local CaptureService = game:GetService("CaptureService")
 local ScriptEditorService = game:GetService("ScriptEditorService")
+local StudioService = game:GetService("StudioService")
 
-local GenerateTiledLUT = require(script.GenerateTiledLUT)
-
-local function screenshot()
-	local result: string?
-	local complete = false
-	local thread = coroutine.running()
-	CaptureService:CaptureScreenshot(function(contentUri: string)
-		result = contentUri
-		complete = true
-		task.spawn(thread)
-	end)
-
-	while not complete do
-		coroutine.yield()
-	end
-
-	return result and AssetService:CreateEditableImageAsync(Content.fromUri(result))
-end
+local CaptureLUT = require(script.CaptureLUT)
 
 @native
 local function writeCube(editImage: EditableImage, lutSize: number?)
@@ -68,54 +51,53 @@ local function writeCube(editImage: EditableImage, lutSize: number?)
 	return module
 end
 
-local function captureLUT()
-	local camera = workspace.CurrentCamera :: Camera
-	camera.CameraType = Enum.CameraType.Scriptable
-	camera.CFrame = CFrame.identity
+local function writeLUT(editImage: EditableImage)
+	local meshPart = Instance.new("MeshPart")
+	meshPart.TextureContent = Content.fromObject(editImage)
+	meshPart.Name = "LUT"
+	meshPart.Parent = game:GetService("StarterGui")
 
-	local height = 2 * math.tan(math.rad(camera.FieldOfView / 2))
-	local width = (camera.ViewportSize.X / camera.ViewportSize.Y) * height
-
-	local part = Instance.new("Part")
-	part.Locked = true
-	part.Anchored = true
-	part.Size = Vector3.new(width, height, 1)
-	part.CFrame = CFrame.new(0, 0, -1.5)
-	part.Parent = workspace
-
-	local surface = Instance.new("SurfaceGui")
-	surface.SizingMode = Enum.SurfaceGuiSizingMode.FixedSize
-	surface.CanvasSize = Vector2.new(4096, 4096)
-	surface.Face = Enum.NormalId.Back
-	surface.LightInfluence = 0
-	surface.Parent = part
-
-	local frame, destroyImages = GenerateTiledLUT()
-	frame.Parent = surface
-
-	workspace:SetAttribute("Ready", false)
-	workspace:GetAttributeChangedSignal("Ready"):Wait()
-	workspace:SetAttribute("Ready", nil)
-
-	local editImage = screenshot()
-	destroyImages()
-
-	if editImage then
-		local meshPart = Instance.new("MeshPart")
-		meshPart.TextureContent = Content.fromObject(editImage)
-		meshPart.Name = "LUT"
-		meshPart.Parent = game:GetService("StarterGui")
-
-		local cubeModule = writeCube(editImage, 65) -- 33, 65, 256
-		cubeModule.Parent = meshPart
-	end
-
-	part:Destroy()
+	-- lutSize typically is 33 or 65, but can put 256 for full resolution
+	local cubeModule = writeCube(editImage, 65)
+	cubeModule.Parent = meshPart
 end
 
 local toolbar = plugin:CreateToolbar("GenLUT")
-local button = toolbar:CreateButton("LUT", "", "")
+local captureButton = toolbar:CreateButton("Capture LUT", "", "")
+local loadButton = toolbar:CreateButton("Load LUT", "", "")
 
-button.Click:Connect(function()
-	captureLUT()
+local debounce = false
+captureButton.Click:Connect(function()
+	if not debounce then
+		debounce = true
+
+		local runCapture = CaptureLUT()
+
+		warn("Click the Capture LUT button again when ready")
+
+		local thread = coroutine.running()
+		captureButton.Click:Once(function()
+			task.spawn(thread)
+		end)
+
+		coroutine.yield()
+
+		local editImage = runCapture()
+		if editImage then
+			writeLUT(editImage)
+		end
+
+		debounce = false
+	end
+end)
+
+loadButton.Click:Connect(function()
+	local file = (StudioService:PromptImportFileAsync({ "png" }) :: any) :: File?
+	local editImage = if file
+		then AssetService:CreateEditableImageAsync(Content.fromUri(file:GetTemporaryId()))
+		else nil
+
+	if editImage then
+		writeLUT(editImage)
+	end
 end)

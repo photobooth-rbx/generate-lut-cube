@@ -1,5 +1,7 @@
 local AssetService = game:GetService("AssetService")
-local Parallel = require(script.Parent.Packages.Parallel)
+
+local pluginRoot = script:FindFirstAncestor("PluginRoot")
+local Parallel = require(pluginRoot.Packages.Parallel)
 
 type WorkerAction = typeof(require(script.Worker))
 
