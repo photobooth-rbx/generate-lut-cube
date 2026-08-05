@@ -36,6 +36,7 @@ local function captureLUT()
 	part.Parent = workspace
 
 	local surface = Instance.new("SurfaceGui")
+	surface.AlwaysOnTop = true
 	surface.SizingMode = Enum.SurfaceGuiSizingMode.FixedSize
 	surface.CanvasSize = Vector2.new(4096, 4096)
 	surface.Face = Enum.NormalId.Back
