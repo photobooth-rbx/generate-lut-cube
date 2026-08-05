@@ -4,6 +4,8 @@
 /placefiles
 /.vscode/settings.json
 
+*_256.cube
+
 *.env
 *.rbxm
 globalTypes.d.lua
