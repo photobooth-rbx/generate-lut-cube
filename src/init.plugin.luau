@@ -58,8 +58,11 @@ local function writeLUT(editImage: EditableImage)
 	meshPart.Parent = game:GetService("StarterGui")
 
 	-- lutSize typically is 33 or 65, but can put 256 for full resolution
-	local cubeModule = writeCube(editImage, 65)
-	cubeModule.Parent = meshPart
+	for _, v in { 33, 65 } do
+		local cubeModule = writeCube(editImage, v)
+		cubeModule.Name = `LUT_{tostring(v)}`
+		cubeModule.Parent = meshPart
+	end
 end
 
 local toolbar = plugin:CreateToolbar("GenLUT")
